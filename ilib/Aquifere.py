@@ -6,8 +6,8 @@ from matplotlib.pylab import meshgrid,arange
 from calcAquifere import *
 
 class Aquifere:
-    """Classe contenant les donnees de l'aquifere
-    taille, caracteristique de la grille, zone, valeur de base
+    """This is class that contains the major characteristics of the domain, grid...
+    
     """
 
     def __init__(self, model):
