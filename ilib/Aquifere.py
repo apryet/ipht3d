@@ -7,7 +7,7 @@ from calcAquifere import *
 
 class Aquifere:
     """This is class that contains the major characteristics of the domain, grid...
-    
+       Hello 
     """
 
     def __init__(self, model):
