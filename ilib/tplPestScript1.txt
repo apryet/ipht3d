@@ -1,0 +1,62 @@
+import os,time,sys 
+from pylab import loadtxt,savetxt
+mdir='ppmdir' 
+fdir='ppfdir' 
+fname='ppfname'
+
+sys.path.append(mdir) 
+from ilib import iPht3dModel 
+mod=iPht3dModel.iPht3dModel(mainDir=mdir) 
+mod.setProject([fdir,fname]) 
+mod.openModel()
+
+# change the values in the model to initial ones and writes the files
+dicMF={'K':'Permeabilite'}
+prtMF,prtMT,prtPH=False,False,False
+kparm=[];parm=[]
+
+f1=open(fdir+os.sep+'pest_run.txt','r');
+for l in f1:
+    if len(l)>3: parm.append(l.split())
+f1.close()
+
+for pl in parm:
+    name=pl[0];v0=pl[1];grp=name[:2];catg=name[2]
+    if grp=='MF':
+        prtMF=True
+        if name[3:6]!='bac':
+            zn=name[3:];print zn
+            z=mod.Aquifere.getZoneByName(dicMF[catg],zn);
+            z.setVal(v0)
+    elif grp=='MT':
+        prtMT=True
+        if catg=='P':
+            pt=mod.getParm('Transport','Transp')
+            pn=name[3:];
+            mod.Transport.setParmDetail(pn,v0)
+        if catg=='T':
+            zn=name[3:];print zn
+            z=mod.Aquifere.getZoneByName('Transport',zn);
+            z.setVal(v0)
+        if catg=='n':
+            zn=name[3:];print zn
+            z=mod.Aquifere.getZoneByName('Porosite',zn);
+            z.setVal(v0)
+    elif grp=='PH':
+        prtPH=True
+        if catg=='k':
+            pn=name[3:];pn=pn[:-1]
+            kparm.append((pn,name[-1:],v0))
+            
+if prtMF: mod.doAction('Ecoulement','Write',info=False)
+if prtMT: mod.doAction('Transport','Write',info=False)
+if prtPH:
+        kdict=mod.PHT3D.getChemDict('Rates')
+        lesp,nparm,lval=zip(*kparm)
+        for i in range(len(lesp)):
+            sp=lesp[i];ind=kdict['rows'].index(sp);print kdict['data'][ind]
+            kdict['data'][ind][int(nparm[i])+2]=lval[i]
+        mod.PHT3D.setChemDict('Rates',kdict)
+        mod.doAction('PHT3D','Write',info=False)
+
+

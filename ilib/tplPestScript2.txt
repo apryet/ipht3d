@@ -1,0 +1,27 @@
+import os,time,sys 
+from pylab import loadtxt,savetxt 
+mdir='ppmdir' 
+fdir='ppfdir' 
+fname='ppfname' 
+tlist=pptime
+sys.path.append(mdir) 
+from ilib import iPht3dModel
+mod=iPht3dModel.iPht3dModel(mainDir=mdir) 
+mod.setProject([fdir,fname]) 
+mod.openModel() 
+iper=1;typ='B1';group='Transport';
+spec=ppospec;nsp=len(spec)
+lnames=pponames
+for j in range(len(lnames)):
+    zname=lnames[j];t2=tlist[j]
+    t,d0,labels=mod.onPtObs(typ,iper,group,zname,spec) 
+    fn=fdir+os.sep+'out'+zname+'.txt' 
+    f1=open(fn,'w');n=0 
+    for i in range(len(t)):
+        if n>len(t2)-1:break
+        if abs(t[i]-t2[n])<1e-3:  
+            f1.write('%9.3e '%(t[i]))  
+            for c in range(nsp):
+                f1.write('%9.3e '%(d0[i,c]))  
+            f1.write('\n');n+=1 
+    f1.close() 
